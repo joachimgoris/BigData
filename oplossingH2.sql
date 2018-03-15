@@ -56,3 +56,49 @@ BEGIN
     END IF;
     RETURN v_datum;
 END;
+
+/*oef7*/
+CREATE OR REPLACE FUNCTION get_jaarloon
+(p_emp_id, employees_employee_id%type)
+    RETURN VARCHAR2
+AS
+    v_sal employees.salary%type;
+    v_comm employees.commission_pct%type;
+    v_jaarsal number;
+BEGIN
+    SELECT salary, commission_pct
+    INTO v_sal, v_comm
+    FROM employees
+    WHERE employee_id = p_emp_id;
+    v_jaarsal := (v_sal+v_sal*NVL(v_comm, 0))*12;
+    return v_jaarsal;
+END;
+
+/*oef8*/
+CREATE OR REPLACE FUNCTION hoofd_meeste_wn
+RETURN VARCHAR2
+AS 
+    v_dep_id employees.department_id%type;
+    v_aantal NUMBER;
+    v_manager_id employees.manager_id%type;
+    v_first employees.first_name%type;
+    v_last employees.last_name%type;
+BEGIN 
+    SELECT department_id, count(employee_id)
+    INTO v_dep_id, v_aantal
+    FROM employees
+    GROUP by department_id
+    HAVING count(employee_id) = (SELECT max(count(employee_id))
+                                FROM employees
+                                GROUP BY department_id);
+    SELECT  manager_id
+    INTO v_manager_id
+    FROM departments
+    WHERE department_id = v_dep_id;
+    
+    SELECT first_name, last_name
+    into v_first, v_last
+    FROM employees
+    WHERE employee_id = v_manager_id
+    RETURN v_first || ''||v_last;
+END;
