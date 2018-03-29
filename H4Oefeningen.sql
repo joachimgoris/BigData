@@ -31,3 +31,18 @@ BEGIN
     VALUES(user,sysdate,systimestamp,v_actie);
 END;
 /
+
+/*oef3*/
+CREATE OR REPLACE TRIGGER aur_emp
+    AFTER update OF salary
+    ON employees
+    FOR EACH ROW
+DECLARE
+BEGIN
+    IF :new.salary > :old.salary*1.05 THEN
+        RAISE_APPLICATION_ERROR(-20000,'Een loonsverhoging van meer dan 5% is niet toegelaten!');
+    ELSIF :new.salary< :old.salary THEN
+        RAISE_APPLICATION_ERROR(-200000, 'Een loonsverhoging kan niet!');
+    END IF;
+END;
+/
